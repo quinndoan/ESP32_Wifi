@@ -1970,3 +1970,55 @@
 147	329	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.elf	e1ee9c41d5033308
 147	329	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.bin	e1ee9c41d5033308
 147	329	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.map	e1ee9c41d5033308
+156	378	7461007071579437	bootloader-prefix/src/bootloader-stamp/bootloader-build	e1ee9c41d5033308
+156	378	7461007071579437	bootloader/bootloader.elf	e1ee9c41d5033308
+156	378	7461007071579437	bootloader/bootloader.bin	e1ee9c41d5033308
+156	378	7461007071579437	bootloader/bootloader.map	e1ee9c41d5033308
+156	378	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	e1ee9c41d5033308
+156	378	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.elf	e1ee9c41d5033308
+156	378	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.bin	e1ee9c41d5033308
+156	378	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.map	e1ee9c41d5033308
+174	361	7461007071579437	bootloader-prefix/src/bootloader-stamp/bootloader-build	e1ee9c41d5033308
+174	361	7461007071579437	bootloader/bootloader.elf	e1ee9c41d5033308
+174	361	7461007071579437	bootloader/bootloader.bin	e1ee9c41d5033308
+174	361	7461007071579437	bootloader/bootloader.map	e1ee9c41d5033308
+174	361	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	e1ee9c41d5033308
+174	361	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.elf	e1ee9c41d5033308
+174	361	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.bin	e1ee9c41d5033308
+174	361	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.map	e1ee9c41d5033308
+191	772	7464581741153493	esp-idf/main/CMakeFiles/__idf_main.dir/softap_example_main.c.obj	3f64499862659203
+773	868	7464581742284965	esp-idf/main/libmain.a	9ec8a6ca8c454eba
+869	7139	7464581804723860	esp-idf/esp_system/ld/sections.ld	3333f4fe0250fdda
+869	7139	7464581804723860	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/esp-idf/esp_system/ld/sections.ld	3333f4fe0250fdda
+7139	10186	7464581835151748	ESP_IDF_WIFI_AP.elf	62ccad3cd3425e07
+10187	10491	7464581838472222	.bin_timestamp	46cb7eae912a2acb
+10187	10491	7464581838472222	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/.bin_timestamp	46cb7eae912a2acb
+10492	10569	0	esp-idf/esptool_py/CMakeFiles/app_check_size	16436846d52d90a9
+10492	10569	0	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/esp-idf/esptool_py/CMakeFiles/app_check_size	16436846d52d90a9
+103	188	0	esp-idf/esptool_py/CMakeFiles/app_check_size	16436846d52d90a9
+103	188	0	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/esp-idf/esptool_py/CMakeFiles/app_check_size	16436846d52d90a9
+87	228	7461007071579437	bootloader-prefix/src/bootloader-stamp/bootloader-build	e1ee9c41d5033308
+87	228	7461007071579437	bootloader/bootloader.elf	e1ee9c41d5033308
+87	228	7461007071579437	bootloader/bootloader.bin	e1ee9c41d5033308
+87	228	7461007071579437	bootloader/bootloader.map	e1ee9c41d5033308
+87	228	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	e1ee9c41d5033308
+87	228	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.elf	e1ee9c41d5033308
+87	228	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.bin	e1ee9c41d5033308
+87	228	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.map	e1ee9c41d5033308
+110	288	7461007071579437	bootloader-prefix/src/bootloader-stamp/bootloader-build	e1ee9c41d5033308
+110	288	7461007071579437	bootloader/bootloader.elf	e1ee9c41d5033308
+110	288	7461007071579437	bootloader/bootloader.bin	e1ee9c41d5033308
+110	288	7461007071579437	bootloader/bootloader.map	e1ee9c41d5033308
+110	288	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	e1ee9c41d5033308
+110	288	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.elf	e1ee9c41d5033308
+110	288	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.bin	e1ee9c41d5033308
+110	288	7461007071579437	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader/bootloader.map	e1ee9c41d5033308
+119	680	7464587029963950	esp-idf/main/CMakeFiles/__idf_main.dir/softap_example_main.c.obj	3f64499862659203
+680	773	7464587031086282	esp-idf/main/libmain.a	9ec8a6ca8c454eba
+773	6800	7464587091124805	esp-idf/esp_system/ld/sections.ld	3333f4fe0250fdda
+773	6800	7464587091124805	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/esp-idf/esp_system/ld/sections.ld	3333f4fe0250fdda
+6800	9816	7464587121033267	ESP_IDF_WIFI_AP.elf	62ccad3cd3425e07
+9816	10073	7464587124072892	.bin_timestamp	46cb7eae912a2acb
+9816	10073	7464587124072892	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/.bin_timestamp	46cb7eae912a2acb
+10073	10159	0	esp-idf/esptool_py/CMakeFiles/app_check_size	16436846d52d90a9
+10073	10159	0	C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/esp-idf/esptool_py/CMakeFiles/app_check_size	16436846d52d90a9
