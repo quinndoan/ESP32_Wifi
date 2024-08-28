@@ -18,6 +18,7 @@
     "files.associations": {
         "*.embeddedhtml": "html",
         "esp_wifi.h": "c",
-        "task.h": "c"
+        "task.h": "c",
+        "esp_log.h": "c"
     }
 }
