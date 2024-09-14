@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "ESP_IDF_WIFI_AP",
-    "project_version":    "cea9f4a-dirty",
+    "project_version":    "98a85a5-dirty",
     "project_path":       "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP",
     "idf_path":           "C:/esp/v5.3/esp-idf",
     "build_dir":          "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build",
@@ -1165,7 +1165,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/esp-idf/main/libmain.a",
-            "sources": [ "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/main/softap_example_main.c" ],
+            "sources": [ "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/main/appMain.c", "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/main/AP.c", "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/main/Sta.c", "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/main/FunctionInUsed.c" ],
             "include_dirs": [ "." ]
         },
         "mbedtls": {
