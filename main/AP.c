@@ -42,16 +42,73 @@ void wifi_init_softap(void) {
 }
 
 
-// Xử lý yêu cầu HTTP POST để cung cấp trang cấu hình WiFi
+// // Xử lý yêu cầu HTTP POST để cung cấp trang cấu hình WiFi
+// esp_err_t root_get_handler(httpd_req_t *req) {
+//     const char resp[] = "<!DOCTYPE html><html><body><form action=\"/setup\" method=\"post\">"
+//                         "SSID: <input type=\"text\" name=\"ssid\"><br>"
+//                         "Password: <input type=\"password\" name=\"password\"><br>"
+//                         "<input type=\"submit\" value=\"Submit\"></form></body></html>";
+//     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+//     return ESP_OK;
+// }
+
 esp_err_t root_get_handler(httpd_req_t *req) {
-    const char resp[] = "<!DOCTYPE html><html><body><form action=\"/setup\" method=\"post\">"
-                        "SSID: <input type=\"text\" name=\"ssid\"><br>"
-                        "Password: <input type=\"password\" name=\"password\"><br>"
-                        "<input type=\"submit\" value=\"Submit\"></form></body></html>";
+    const char resp[] = "<!DOCTYPE html><html><head>"
+                        "<style>"
+                        "body {"
+                        "  background-image: url('https://drive.google.com/file/d/1IBvc80BpTBpE8Awo_3ZvqtV9WdnF_zwq/view?usp=sharing');"
+                        "  background-size: cover;"
+                        "  font-family: Arial, sans-serif;"
+                        "  display: flex;"
+                        "  justify-content: center;"
+                        "  align-items: center;"
+                        "  height: 100vh;"
+                        "  margin: 0;"
+                        "}"
+                        ".container {"
+                        "  background-color: rgba(255, 255, 255, 0.8);"
+                        "  padding: 20px;"
+                        "  border-radius: 10px;"
+                        "  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);"
+                        "}"
+                        "h1 {"
+                        "  text-align: center;"
+                        "  color: #333;"
+                        "}"
+                        "input[type='text'], input[type='password'] {"
+                        "  width: 100%;"
+                        "  padding: 12px 20px;"
+                        "  margin: 8px 0;"
+                        "  display: inline-block;"
+                        "  border: 1px solid #ccc;"
+                        "  border-radius: 4px;"
+                        "  box-sizing: border-box;"
+                        "}"
+                        "input[type='submit'] {"
+                        "  width: 100%;"
+                        "  background-color: #4CAF50;"
+                        "  color: white;"
+                        "  padding: 14px 20px;"
+                        "  margin: 8px 0;"
+                        "  border: none;"
+                        "  border-radius: 4px;"
+                        "  cursor: pointer;"
+                        "}"
+                        "input[type='submit']:hover {"
+                        "  background-color: #45a049;"
+                        "}"
+                        "</style>"
+                        "</head><body>"
+                        "<div class=\"container\">"
+                        "<h1>WiFi AP Setup</h1>"
+                        "<form action=\"/setup\" method=\"post\">"
+                        "SSID: <input type=\"text\" name=\"ssid\" placeholder=\"Enter SSID\"><br>"
+                        "Password: <input type=\"password\" name=\"password\" placeholder=\"Enter Password\"><br>"
+                        "<input type=\"submit\" value=\"Submit\">"
+                        "</form></div></body></html>";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
-
 
 // Xử lý yêu cầu HTTP POST để nhận và lưu thông tin WiFi mới
 esp_err_t setup_post_handler(httpd_req_t *req) {
