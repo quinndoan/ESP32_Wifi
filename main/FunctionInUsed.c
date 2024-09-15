@@ -1,11 +1,12 @@
 #include"library.h"
 #include"FunctionInUsed.h"
 
-static const char *TAG = "wifi"; // sử dụng một TAG cho ESP để có thể chuyển đổi giữa hai mode
-static int s_retry_num = 0;
-static EventGroupHandle_t s_wifi_event_group;
+const char *TAG = "wifi"; // sử dụng một TAG cho ESP để có thể chuyển đổi giữa hai mode
+int s_retry_num = 0;
+EventGroupHandle_t s_wifi_event_group;
+
 // Cập nhật hàm wifi_event_handler để xử lý cả hai chế độ AP và STA
-static void wifi_event_handler(void* arg, esp_event_base_t event_base,
+void wifi_event_handler(void* arg, esp_event_base_t event_base,
                                     int32_t event_id, void* event_data) {
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_STACONNECTED) {
         wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) event_data;

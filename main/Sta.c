@@ -1,7 +1,7 @@
 #include"Sta.h"
 
-extern int s_retry_num = 0;
-extern const char *TAG = "wifi"; // sử dụng một TAG cho ESP để có thể chuyển đổi giữa hai mode
+extern int s_retry_num;
+extern const char *TAG; // sử dụng một TAG cho ESP để có thể chuyển đổi giữa hai mode
 extern EventGroupHandle_t s_wifi_event_group;
 
 // Hàm để khởi tạo WiFi ở chế độ STA

@@ -1,6 +1,6 @@
 #include "AP.h"
 
-extern const char *TAG = "wifi"; // sử dụng một TAG cho ESP để có thể chuyển đổi giữa hai mode
+extern const char *TAG; // sử dụng một TAG cho ESP để có thể chuyển đổi giữa hai mode
 extern EventGroupHandle_t s_wifi_event_group;
 
 void wifi_init_softap(void) {
@@ -43,7 +43,7 @@ void wifi_init_softap(void) {
 
 
 // Xử lý yêu cầu HTTP POST để cung cấp trang cấu hình WiFi
-static esp_err_t root_get_handler(httpd_req_t *req) {
+esp_err_t root_get_handler(httpd_req_t *req) {
     const char resp[] = "<!DOCTYPE html><html><body><form action=\"/setup\" method=\"post\">"
                         "SSID: <input type=\"text\" name=\"ssid\"><br>"
                         "Password: <input type=\"password\" name=\"password\"><br>"
@@ -54,7 +54,7 @@ static esp_err_t root_get_handler(httpd_req_t *req) {
 
 
 // Xử lý yêu cầu HTTP POST để nhận và lưu thông tin WiFi mới
-static esp_err_t setup_post_handler(httpd_req_t *req) {
+esp_err_t setup_post_handler(httpd_req_t *req) {
     char buf[100];
     int ret, remaining = req->content_len;
 
