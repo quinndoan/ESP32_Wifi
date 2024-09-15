@@ -56,15 +56,16 @@ esp_err_t root_get_handler(httpd_req_t *req) {
     const char resp[] = "<!DOCTYPE html><html><head>"
                         "<style>"
                         "body {"
-                        "  background-image: url('https://drive.google.com/file/d/1IBvc80BpTBpE8Awo_3ZvqtV9WdnF_zwq/view?usp=sharing');"
+                        "  background-image: url('https://drive.google.com/uc?export=view&id=1IBvc80BpTBpE8Awo_3ZvqtV9WdnF_zwq');"
                         "  background-size: cover;"
+                        "  background-position: center;"
                         "  font-family: Arial, sans-serif;"
                         "  display: flex;"
                         "  justify-content: center;"
                         "  align-items: center;"
                         "  height: 100vh;"
                         "  margin: 0;"
-                        "}"
+                        "} "
                         ".container {"
                         "  background-color: rgba(255, 255, 255, 0.8);"
                         "  padding: 20px;"
@@ -100,7 +101,7 @@ esp_err_t root_get_handler(httpd_req_t *req) {
                         "</style>"
                         "</head><body>"
                         "<div class=\"container\">"
-                        "<h1>WiFi AP Setup</h1>"
+                        "<h1>AIThingsLab</h1>"
                         "<form action=\"/setup\" method=\"post\">"
                         "SSID: <input type=\"text\" name=\"ssid\" placeholder=\"Enter SSID\"><br>"
                         "Password: <input type=\"password\" name=\"password\" placeholder=\"Enter Password\"><br>"
@@ -109,6 +110,7 @@ esp_err_t root_get_handler(httpd_req_t *req) {
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
+
 
 // Xử lý yêu cầu HTTP POST để nhận và lưu thông tin WiFi mới
 esp_err_t setup_post_handler(httpd_req_t *req) {
