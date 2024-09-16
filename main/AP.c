@@ -41,17 +41,6 @@ void wifi_init_softap(void) {
              EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS, EXAMPLE_ESP_WIFI_CHANNEL);
 }
 
-
-// // Xử lý yêu cầu HTTP POST để cung cấp trang cấu hình WiFi
-// esp_err_t root_get_handler(httpd_req_t *req) {
-//     const char resp[] = "<!DOCTYPE html><html><body><form action=\"/setup\" method=\"post\">"
-//                         "SSID: <input type=\"text\" name=\"ssid\"><br>"
-//                         "Password: <input type=\"password\" name=\"password\"><br>"
-//                         "<input type=\"submit\" value=\"Submit\"></form></body></html>";
-//     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-//     return ESP_OK;
-// }
-
 esp_err_t root_get_handler(httpd_req_t *req) {
     const char resp[] = "<!DOCTYPE html><html><head>"
                         "<style>"

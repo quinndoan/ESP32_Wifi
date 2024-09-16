@@ -14,6 +14,7 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 #include "esp_http_server.h"
+#include "driver/uart.h"
 #include "nvs.h"
 
 #define EXAMPLE_ESP_WIFI_SSID      CONFIG_ESP_WIFI_SSID
@@ -25,5 +26,8 @@
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
+
+#define UART_NUM UART_NUM_1
+#define BUF_SIZE (1024)
 
 #endif

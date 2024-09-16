@@ -36,4 +36,6 @@ void wifi_init_sta(const char* ssid, const char* password) {
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA)); // Đặt chế độ WiFi thành STA
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config)); // Đặt cấu hình WiFi cho chế độ STA
     ESP_ERROR_CHECK(esp_wifi_start()); // Bắt đầu WiFi
+
+    ESP_LOGI(TAG,"wifi_init_sta finished");
 }
