@@ -1,15 +1,12 @@
 | Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-C6 | ESP32-S2 | ESP32-S3 |
 | ----------------- | ----- | -------- | -------- | -------- | -------- | -------- |
 
-# Wi-Fi SoftAP Example
+# ESP32_ Module Wifi
 
 (See the README.md file in the upper level 'examples' directory for more information about examples.)
 
-This example shows how to use the Wi-Fi SoftAP functionality of the Wi-Fi driver of ESP for serving as an Access Point.
+This example shows how to use the Wi-Fi SoftAP and Wifi Station for ESP32 to work as a client and server
 
-## How to use example
-
-SoftAP supports Protected Management Frames(PMF). Necessary configurations can be set using pmf flags. Please refer [Wifi-Security](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/wifi-security.html) for more info.
 
 ### Configure the project
 
@@ -39,7 +36,7 @@ See the Getting Started Guide for all the steps to configure and use the ESP-IDF
 
 ## Example Output
 
-There is the console output for this example:
+There is the console output for SoftAP Mode:
 
 ```
 I (917) phy: phy_version: 3960, 5211945, Jul 18 2018, 10:40:07, 0, 0
