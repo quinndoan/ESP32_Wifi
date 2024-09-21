@@ -14,7 +14,7 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 #include "esp_http_server.h"
-#include "driver/uart.h"
+//#include "driver/uart.h"
 #include "nvs.h"
 
 #define EXAMPLE_ESP_WIFI_SSID      CONFIG_ESP_WIFI_SSID
