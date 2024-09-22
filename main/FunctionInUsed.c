@@ -1,7 +1,7 @@
 #include"library.h"
 #include"FunctionInUsed.h"
 
-const char *TAG = "wifi"; // sử dụng một TAG cho ESP để có thể chuyển đổi giữa hai mode
+extern const char *TAG; // sử dụng một TAG cho ESP để có thể chuyển đổi giữa hai mode
 int s_retry_num = 0;
 
 EventGroupHandle_t s_wifi_event_group;
