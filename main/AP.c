@@ -96,7 +96,7 @@ esp_err_t root_get_handler(httpd_req_t *req) {
                         "<script>"
                         "function toggleInputs() {"
                         "  var mode = document.getElementById('mode-select').value;"
-                        "  if (mode == '0') {"
+                        "  if (mode == '0') {"  // Chỉ hiện SSID và Password khi mode là 0
                         "    document.getElementById('ssid-input').style.display = 'block';"
                         "    document.getElementById('password-input').style.display = 'block';"
                         "  } else {"
@@ -104,6 +104,9 @@ esp_err_t root_get_handler(httpd_req_t *req) {
                         "    document.getElementById('password-input').style.display = 'none';"
                         "  }"
                         "}"
+                        "window.onload = function() {"
+                        "  toggleInputs();"
+                        "};"
                         "</script>"
                         "</head><body>"
                         "<div class=\"container\">"
@@ -121,6 +124,7 @@ esp_err_t root_get_handler(httpd_req_t *req) {
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
+
 
 esp_err_t setup_post_handler(httpd_req_t *req) {
     char buf[200];
@@ -142,63 +146,80 @@ esp_err_t setup_post_handler(httpd_req_t *req) {
     // Phân tích dữ liệu nhận được từ biểu mẫu
     char ssid[32] = {0};
     char password[64] = {0};
-    int mode = 1; // Mặc định là AP Mode
+    int mode = 1;
 
-    // Phân tích giá trị từ dữ liệu POST
-    sscanf(buf, "mode=%d", &mode);// 0 là STA mode
-    if (mode == 0) {
-        sscanf(buf, "ssid=%[^&]&password=%s", ssid, password);
-         ESP_LOGI(TAG, "Received SSID: %s, Password: %s for STA Mode", ssid, password);
+    // Đảm bảo thứ tự trong sscanf khớp với thứ tự trong dữ liệu POST
+    int scanned = sscanf(buf, "mode=%d&ssid=%[^&]&password=%s", &mode, ssid, password);
+    if (scanned != 3) { // Kiểm tra đủ 3 biến được phân tích không
+        ESP_LOGE("SETUP", "Failed to parse ssid, password and mode. Input data: %s", buf);
+        const char resp[] = "Failed to parse SSID, password, and mode. Please try again.";
+        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+        return ESP_FAIL;
+    }
 
-        // Kiểm tra xem SSID và Password có hợp lệ không
-        if (strlen(ssid) == 0 || strlen(password) == 0) {
-            ESP_LOGE(TAG, "Invalid SSID or Password received. Aborting.");
-            const char resp[] = "Invalid SSID or Password. Please try again.";
+    ESP_LOGI("SETUP", "Received SSID: %s, Password: %s, Mode: %d", ssid, password, mode);
+
+    // Lưu chế độ và thông tin Wi-Fi vào NVS
+    nvs_handle_t nvs_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &nvs_handle);
+    if (err != ESP_OK) {
+        ESP_LOGE("SETUP", "Failed to open NVS handle! Error: %s", esp_err_to_name(err));
+        const char resp[] = "Failed to open NVS. Please try again.";
+        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+        return ESP_FAIL;
+    }
+
+    // Lưu chế độ vào NVS
+    err = nvs_set_i32(nvs_handle, "wifi_mode", mode);
+    if (err != ESP_OK) {
+        ESP_LOGE("SETUP", "Failed to set WiFi mode in NVS! Error: %s", esp_err_to_name(err));
+    }
+
+    // Nếu có SSID và Password, lưu chúng vào NVS
+    if (strlen(ssid) > 0 && strlen(password) > 0) {
+        err = nvs_set_str(nvs_handle, "ssid", ssid);
+        if (err != ESP_OK) {
+            ESP_LOGE("SETUP", "Failed to set SSID in NVS! Error: %s", esp_err_to_name(err));
+            nvs_close(nvs_handle);
+            const char resp[] = "Failed to save SSID. Please try again.";
+            httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+            return ESP_FAIL;
+        }
+
+        err = nvs_set_str(nvs_handle, "password", password);
+        if (err != ESP_OK) {
+            ESP_LOGE("SETUP", "Failed to set Password in NVS! Error: %s", esp_err_to_name(err));
+            nvs_close(nvs_handle);
+            const char resp[] = "Failed to save Password. Please try again.";
             httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
             return ESP_FAIL;
         }
     }
-    
 
-    // Lưu chế độ vào NVS
-    nvs_handle_t nvs_handle;
-    ESP_ERROR_CHECK(nvs_open("storage", NVS_READWRITE, &nvs_handle));
-    ESP_ERROR_CHECK(nvs_set_i32(nvs_handle, "wifi_mode", mode));
-    if (mode == 0) {
-        ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "ssid", ssid));
-        ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "password", password));
+    // Commit thay đổi để lưu vào NVS
+    err = nvs_commit(nvs_handle);
+    if (err != ESP_OK) {
+        ESP_LOGE("SETUP", "Failed to commit changes in NVS! Error: %s", esp_err_to_name(err));
+        nvs_close(nvs_handle);
+        const char resp[] = "Failed to save settings. Please try again.";
+        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+        return ESP_FAIL;
     }
-    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
+
+    // Đóng NVS
     nvs_close(nvs_handle);
 
-    // Gửi phản hồi đến client và khởi động lại thiết bị
-    const char resp[] = "Settings updated successfully. Rebooting the device...";
+    // Gửi phản hồi thành công đến client
+    const char resp[] = "WiFi settings have been updated. Rebooting the device now...";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
     // Đợi một chút rồi khởi động lại thiết bị để áp dụng cài đặt mới
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-    esp_restart();
+    vTaskDelay(1000 / portTICK_PERIOD_MS); // Chờ 1 giây để hoàn thành phản hồi HTTP
+    esp_restart(); // Khởi động lại thiết bị để áp dụng chế độ mới
 
     return ESP_OK;
-
-    // // Chuyển ngay sang chế độ mới dựa trên giá trị `mode`
-    // if (mode == 0) {
-    //     // Chuyển sang chế độ STA Mode
-    //     ESP_LOGI(TAG, "Switching to STA Mode with SSID: %s", ssid);
-    //     wifi_init_sta(ssid, password); // Khởi động lại Wi-Fi với SSID và Password mới
-    // } else if (mode == 1) {
-    //     // Chuyển sang chế độ AP Mode
-    //     ESP_LOGI(TAG, "Switching to AP Mode");
-    //     wifi_init_softap(); // Khởi động lại Wi-Fi ở chế độ AP
-    // } else if (mode == 2) {
-    //     // Chuyển sang chế độ AP + Bluetooth Mode
-    //     ESP_LOGI(TAG, "Switching to AP + Bluetooth Mode");
-    //     wifi_init_softap(); // Khởi động AP
-    //     init_bluetooth();   // Khởi động Bluetooth
-    // }
-
-    // return ESP_OK;
 }
+
 
 // Khởi tạo web server
 void start_webserver(void) {
