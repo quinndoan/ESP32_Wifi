@@ -210,7 +210,7 @@ esp_err_t setup_post_handler(httpd_req_t *req) {
     nvs_close(nvs_handle);
 
     // Gửi phản hồi thành công đến client
-    const char resp[] = "WiFi settings have been updated. Rebooting the device now...";
+    const char resp[] = "WiFi settings have been updated. Change to STA mode...";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
     // Đợi một chút rồi khởi động lại thiết bị để áp dụng cài đặt mới

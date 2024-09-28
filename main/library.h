@@ -1,6 +1,6 @@
 #ifndef LIBRARY_H_
 #define LIBRARY_H_
-
+#include <stdlib.h>
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -16,6 +16,7 @@
 #include "esp_http_server.h"
 #include "driver/gpio.h"
 #include "nvs.h"
+
 
 #define EXAMPLE_ESP_WIFI_SSID      CONFIG_ESP_WIFI_SSID
 #define EXAMPLE_ESP_WIFI_PASS      CONFIG_ESP_WIFI_PASSWORD

@@ -19,6 +19,7 @@
         "*.embeddedhtml": "html",
         "esp_wifi.h": "c",
         "task.h": "c",
-        "esp_log.h": "c"
+        "esp_log.h": "c",
+        "event_groups.h": "c"
     }
 }
