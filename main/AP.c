@@ -44,7 +44,7 @@ void wifi_init_softap(void) {
 }
 
 esp_err_t root_get_handler(httpd_req_t *req) {
-     const char resp[] = "<!DOCTYPE html><html><head>"
+    const char resp[] = "<!DOCTYPE html><html><head>"
                         "<style>"
                         "body {"
                         "  background-image: url('https://drive.google.com/uc?export=view&id=1IBvc80BpTBpE8Awo_3ZvqtV9WdnF_zwq');"
@@ -76,7 +76,7 @@ esp_err_t root_get_handler(httpd_req_t *req) {
                         "  border-radius: 4px;"
                         "  box-sizing: border-box;"
                         "}"
-                        "input[type='submit'] {"
+                        "input[type='submit'], button {"
                         "  width: 100%;"
                         "  background-color: #4CAF50;"
                         "  color: white;"
@@ -86,33 +86,46 @@ esp_err_t root_get_handler(httpd_req_t *req) {
                         "  border-radius: 4px;"
                         "  cursor: pointer;"
                         "}"
-                        "input[type='submit']:hover {"
+                        "input[type='submit']:hover, button:hover {"
                         "  background-color: #45a049;"
                         "}"
+                        "#ssid-input, #password-input {"
+                        "  display: none;"
+                        "}"
                         "</style>"
+                        "<script>"
+                        "function toggleInputs() {"
+                        "  var mode = document.getElementById('mode-select').value;"
+                        "  if (mode == '1') {"
+                        "    document.getElementById('ssid-input').style.display = 'block';"
+                        "    document.getElementById('password-input').style.display = 'block';"
+                        "  } else {"
+                        "    document.getElementById('ssid-input').style.display = 'none';"
+                        "    document.getElementById('password-input').style.display = 'none';"
+                        "  }"
+                        "}"
+                        "</script>"
                         "</head><body>"
                         "<div class=\"container\">"
                         "<h1>AIThingsLab</h1>"
                         "<form action=\"/setup\" method=\"post\">"
-                        "SSID: <input type=\"text\" name=\"ssid\" placeholder=\"Enter SSID\"><br>"
-                        "Password: <input type=\"password\" name=\"password\" placeholder=\"Enter Password\"><br>"
-                        "Mode: <select name=\"mode\">"
-                        "<option value=\"1\">AP Mode</option>"
+                        "Mode: <select id=\"mode-select\" name=\"mode\" onchange=\"toggleInputs()\">"
+                        "<option value=\"1\">STA Mode</option>"
                         "<option value=\"2\">AP Mode + Bluetooth</option>"
                         "</select><br>"
+                        "<div id=\"ssid-input\">SSID: <input type=\"text\" name=\"ssid\" placeholder=\"Enter SSID\"></div>"
+                        "<div id=\"password-input\">Password: <input type=\"password\" name=\"password\" placeholder=\"Enter Password\"></div>"
                         "<input type=\"submit\" value=\"Submit\">"
                         "</form></div></body></html>";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
-
-
-// Xử lý yêu cầu HTTP POST để nhận và lưu thông tin WiFi mới
 esp_err_t setup_post_handler(httpd_req_t *req) {
     char buf[200];
     int ret, remaining = req->content_len;
 
+    // Đọc dữ liệu từ yêu cầu POST
     while (remaining > 0) {
         if ((ret = httpd_req_recv(req, buf, MIN(remaining, sizeof(buf)))) <= 0) {
             if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
@@ -123,83 +136,37 @@ esp_err_t setup_post_handler(httpd_req_t *req) {
         remaining -= ret;
     }
 
-    buf[req->content_len] = '\0';
+    buf[req->content_len] = '\0'; // Kết thúc chuỗi
 
-    
-    // phải sửa lại đoạn code thêm phần chọn mode và có hint cho người dùng biết để chọn mode nào  , 1: AP, 2: AP+Bluetooth
+    // Phân tích dữ liệu nhận được từ biểu mẫu
     char ssid[32] = {0};
     char password[64] = {0};
-    int mode =1; // Mặc định là AP
-    sscanf(buf, "ssid=%[^&]&password=%s&mode=%d", ssid, password, &mode);
+    int mode = 1; // Mặc định là STA Mode
 
-    // Lưu SSID và mật khẩu vào NVS
+    // Phân tích giá trị từ dữ liệu POST
+    sscanf(buf, "mode=%d", &mode);
+    if (mode == 1) {
+        sscanf(buf, "ssid=%[^&]&password=%s", ssid, password);
+    }
+
+    // Lưu chế độ vào NVS
     nvs_handle_t nvs_handle;
     ESP_ERROR_CHECK(nvs_open("storage", NVS_READWRITE, &nvs_handle));
-    ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "ssid", ssid));
-    ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "password", password));
+    ESP_ERROR_CHECK(nvs_set_i32(nvs_handle, "wifi_mode", mode));
+    if (mode == 1) {
+        ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "ssid", ssid));
+        ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "password", password));
+    }
     ESP_ERROR_CHECK(nvs_commit(nvs_handle));
     nvs_close(nvs_handle);
 
-
-    wifi_mode = mode;
-    ESP_ERROR_CHECK(nvs_open("storage", NVS_READWRITE, &nvs_handle));
-    ESP_ERROR_CHECK(nvs_set_i32(nvs_handle, "wifi_mode", wifi_mode));
-    ESP_ERROR_CHECK(nvs_commit(nvs_handle));
-    nvs_close(nvs_handle);
-
-    const char resp[] = "Wi-Fi settings updated successfully. Rebooting the device...";
+    // Gửi phản hồi đến client và khởi động lại thiết bị
+    const char resp[] = "Settings updated successfully. Rebooting the device...";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
-    // Reboot device to apply new settings
-    vTaskDelay(1000 / portTICK_PERIOD_MS); // Delay for log message
+    // Đợi một chút rồi khởi động lại thiết bị để áp dụng cài đặt mới
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     esp_restart();
-
-    return ESP_OK;
-
-}
-
-esp_err_t mode_post_handler(httpd_req_t *req) {
-    char buf[100];
-    int ret, remaining = req->content_len;
-
-    while (remaining > 0) {
-        if ((ret = httpd_req_recv(req, buf, MIN(remaining, sizeof(buf)))) <= 0) {
-            if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
-                continue;
-            }
-            return ESP_FAIL;
-        }
-        remaining -= ret;
-    }
-
-    buf[req->content_len] = '\0';
-
-     // Parse Wi-Fi mode from POST data
-    int new_mode = 1;
-    sscanf(buf, "mode=%d", &new_mode);
-
-    if (new_mode >= 0 && new_mode <= 2) {
-        wifi_mode = new_mode;
-
-        // Save new Wi-Fi mode to NVS
-        nvs_handle_t nvs_handle;
-        ESP_ERROR_CHECK(nvs_open("storage", NVS_READWRITE, &nvs_handle));
-        ESP_ERROR_CHECK(nvs_set_i32(nvs_handle, "wifi_mode", wifi_mode));
-        ESP_ERROR_CHECK(nvs_commit(nvs_handle));
-        nvs_close(nvs_handle);
-
-        // Send response back to client
-        const char resp[] = "Wi-Fi mode updated successfully. Rebooting the device...";
-        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-
-        // Reboot device to apply new Wi-Fi mode
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // Delay for log message
-        esp_restart();
-    } else {
-        // Invalid mode
-        const char resp[] = "Invalid Wi-Fi mode selected.";
-        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-    }
 
     return ESP_OK;
 }
@@ -223,16 +190,9 @@ void start_webserver(void) {
         .user_ctx = NULL
     };
 
-    httpd_uri_t mode = {
-        .uri = "/mode",
-        .method = HTTP_POST,
-        .handler = mode_post_handler,
-        .user_ctx = NULL
-    };
 
     if (httpd_start(&server, &config) == ESP_OK) {
         httpd_register_uri_handler(server, &root);
         httpd_register_uri_handler(server, &setup);
-        httpd_register_uri_handler(server, &mode);
     }
 }
