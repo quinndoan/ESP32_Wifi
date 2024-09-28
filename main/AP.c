@@ -62,11 +62,11 @@ esp_err_t root_get_handler(httpd_req_t *req) {
                         "  padding: 20px;"
                         "  border-radius: 10px;"
                         "  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);"
-                        "}"
+                        "} "
                         "h1 {"
                         "  text-align: center;"
                         "  color: #333;"
-                        "}"
+                        "} "
                         "input[type='text'], input[type='password'] {"
                         "  width: 100%;"
                         "  padding: 12px 20px;"
@@ -75,7 +75,7 @@ esp_err_t root_get_handler(httpd_req_t *req) {
                         "  border: 1px solid #ccc;"
                         "  border-radius: 4px;"
                         "  box-sizing: border-box;"
-                        "}"
+                        "} "
                         "input[type='submit'], button {"
                         "  width: 100%;"
                         "  background-color: #4CAF50;"
@@ -85,18 +85,18 @@ esp_err_t root_get_handler(httpd_req_t *req) {
                         "  border: none;"
                         "  border-radius: 4px;"
                         "  cursor: pointer;"
-                        "}"
+                        "} "
                         "input[type='submit']:hover, button:hover {"
                         "  background-color: #45a049;"
-                        "}"
+                        "} "
                         "#ssid-input, #password-input {"
                         "  display: none;"
-                        "}"
+                        "} "
                         "</style>"
                         "<script>"
                         "function toggleInputs() {"
                         "  var mode = document.getElementById('mode-select').value;"
-                        "  if (mode == '1') {"
+                        "  if (mode == '0') {"
                         "    document.getElementById('ssid-input').style.display = 'block';"
                         "    document.getElementById('password-input').style.display = 'block';"
                         "  } else {"
@@ -110,7 +110,8 @@ esp_err_t root_get_handler(httpd_req_t *req) {
                         "<h1>AIThingsLab</h1>"
                         "<form action=\"/setup\" method=\"post\">"
                         "Mode: <select id=\"mode-select\" name=\"mode\" onchange=\"toggleInputs()\">"
-                        "<option value=\"1\">STA Mode</option>"
+                        "<option value=\"0\">STA Mode</option>" // Cập nhật giá trị là 0 cho STA Mode
+                        "<option value=\"1\">AP Mode</option>"
                         "<option value=\"2\">AP Mode + Bluetooth</option>"
                         "</select><br>"
                         "<div id=\"ssid-input\">SSID: <input type=\"text\" name=\"ssid\" placeholder=\"Enter SSID\"></div>"
@@ -141,11 +142,11 @@ esp_err_t setup_post_handler(httpd_req_t *req) {
     // Phân tích dữ liệu nhận được từ biểu mẫu
     char ssid[32] = {0};
     char password[64] = {0};
-    int mode = 1; // Mặc định là STA Mode
+    int mode = 1; // Mặc định là AP Mode
 
     // Phân tích giá trị từ dữ liệu POST
-    sscanf(buf, "mode=%d", &mode);
-    if (mode == 1) {
+    sscanf(buf, "mode=%d", &mode);// 0 là STA mode
+    if (mode == 0) {
         sscanf(buf, "ssid=%[^&]&password=%s", ssid, password);
     }
 
@@ -153,7 +154,7 @@ esp_err_t setup_post_handler(httpd_req_t *req) {
     nvs_handle_t nvs_handle;
     ESP_ERROR_CHECK(nvs_open("storage", NVS_READWRITE, &nvs_handle));
     ESP_ERROR_CHECK(nvs_set_i32(nvs_handle, "wifi_mode", mode));
-    if (mode == 1) {
+    if (mode == 0) {
         ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "ssid", ssid));
         ESP_ERROR_CHECK(nvs_set_str(nvs_handle, "password", password));
     }

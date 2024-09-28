@@ -62,6 +62,8 @@ void app_main(void) {
 
     }
 
+    
+
      // Start based on saved Wi-Fi mode
     if (wifi_mode == 0) {
         // STA Mode
