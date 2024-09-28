@@ -148,7 +148,17 @@ esp_err_t setup_post_handler(httpd_req_t *req) {
     sscanf(buf, "mode=%d", &mode);// 0 là STA mode
     if (mode == 0) {
         sscanf(buf, "ssid=%[^&]&password=%s", ssid, password);
+         ESP_LOGI(TAG, "Received SSID: %s, Password: %s for STA Mode", ssid, password);
+
+        // Kiểm tra xem SSID và Password có hợp lệ không
+        if (strlen(ssid) == 0 || strlen(password) == 0) {
+            ESP_LOGE(TAG, "Invalid SSID or Password received. Aborting.");
+            const char resp[] = "Invalid SSID or Password. Please try again.";
+            httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+            return ESP_FAIL;
+        }
     }
+    
 
     // Lưu chế độ vào NVS
     nvs_handle_t nvs_handle;
@@ -165,9 +175,27 @@ esp_err_t setup_post_handler(httpd_req_t *req) {
     const char resp[] = "Settings updated successfully. Rebooting the device...";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
 
-    // Đợi một chút rồi khởi động lại thiết bị để áp dụng cài đặt mới
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-    esp_restart();
+    // // Đợi một chút rồi khởi động lại thiết bị để áp dụng cài đặt mới
+    // vTaskDelay(1000 / portTICK_PERIOD_MS);
+    // esp_restart();
+
+    // return ESP_OK;
+
+    // Chuyển ngay sang chế độ mới dựa trên giá trị `mode`
+    if (mode == 0) {
+        // Chuyển sang chế độ STA Mode
+        ESP_LOGI(TAG, "Switching to STA Mode with SSID: %s", ssid);
+        wifi_init_sta(ssid, password); // Khởi động lại Wi-Fi với SSID và Password mới
+    } else if (mode == 1) {
+        // Chuyển sang chế độ AP Mode
+        ESP_LOGI(TAG, "Switching to AP Mode");
+        wifi_init_softap(); // Khởi động lại Wi-Fi ở chế độ AP
+    } else if (mode == 2) {
+        // Chuyển sang chế độ AP + Bluetooth Mode
+        ESP_LOGI(TAG, "Switching to AP + Bluetooth Mode");
+        wifi_init_softap(); // Khởi động AP
+        init_bluetooth();   // Khởi động Bluetooth
+    }
 
     return ESP_OK;
 }
