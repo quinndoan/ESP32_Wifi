@@ -8,6 +8,6 @@ void app_ble_send_data(uint8_t* data, uint16_t len);
 void app_ble_stop(void);
 void app_ble_start(void);
 void app_ble_set_data_recv_callback(void *cb);
-
+void ble_data_received_callback(uint8_t *data, uint16_t length);
 
 #endif

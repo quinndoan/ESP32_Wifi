@@ -4,6 +4,8 @@
 extern int32_t wifi_mode;
 extern const char *TAG; // sử dụng một TAG cho ESP để có thể chuyển đổi giữa hai mode
 extern EventGroupHandle_t s_wifi_event_group;
+// extern bool is_ssid_received;
+// extern bool is_password_received;
 
 void wifi_init_softap(void) {
     esp_netif_create_default_wifi_ap();
@@ -103,6 +105,10 @@ esp_err_t root_get_handler(httpd_req_t *req) {
                         "    document.getElementById('ssid-input').style.display = 'none';"
                         "    document.getElementById('password-input').style.display = 'none';"
                         "  }"
+                        "  if (mode == '2') {"
+                        "    // Nếu chế độ là AP + Bluetooth, thông báo cho người dùng gửi SSID và Password qua BLE."
+                        "    alert('Please send SSID and Password via Bluetooth');"
+                        "  }"
                         "}"
                         "window.onload = function() {"
                         "  toggleInputs();"
@@ -125,100 +131,122 @@ esp_err_t root_get_handler(httpd_req_t *req) {
     return ESP_OK;
 }
 
+// esp_err_t setup_post_handler(httpd_req_t *req) {
+//     char buf[200];
+//     int ret, remaining = req->content_len;
 
-esp_err_t setup_post_handler(httpd_req_t *req) {
-    char buf[200];
-    int ret, remaining = req->content_len;
+//     // Đọc dữ liệu từ yêu cầu POST
+//     while (remaining > 0) {
+//         if ((ret = httpd_req_recv(req, buf, MIN(remaining, sizeof(buf)))) <= 0) {
+//             if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
+//                 continue;
+//             }
+//             return ESP_FAIL;
+//         }
+//         remaining -= ret;
+//     }
 
-    // Đọc dữ liệu từ yêu cầu POST
-    while (remaining > 0) {
-        if ((ret = httpd_req_recv(req, buf, MIN(remaining, sizeof(buf)))) <= 0) {
-            if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
-                continue;
-            }
-            return ESP_FAIL;
-        }
-        remaining -= ret;
-    }
+//     buf[req->content_len] = '\0'; // Kết thúc chuỗi
 
-    buf[req->content_len] = '\0'; // Kết thúc chuỗi
+//     // Phân tích dữ liệu nhận được từ biểu mẫu
+//     char ssid[32] = {0};
+//     char password[64] = {0};
+//     int mode = 1;
 
-    // Phân tích dữ liệu nhận được từ biểu mẫu
-    char ssid[32] = {0};
-    char password[64] = {0};
-    int mode = 1;
+//     // Scan mode trước
+//     int scanned = sscanf(buf, "mode=%d&ssid=%[^&]&password=%s", &mode, ssid, password);
+//     if (scanned < 1) { // Kiểm tra ít nhất phải có mode được phân tích
+//         ESP_LOGE(TAG, "Failed to parse mode. Input data: %s", buf);
+//         const char resp[] = "Failed to parse mode. Please try again.";
+//         httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+//         return ESP_FAIL;
+//     }
 
-    // Đảm bảo thứ tự trong sscanf khớp với thứ tự trong dữ liệu POST
-    int scanned = sscanf(buf, "mode=%d&ssid=%[^&]&password=%s", &mode, ssid, password);
-    if (scanned != 3) { // Kiểm tra đủ 3 biến được phân tích không
-        ESP_LOGE("SETUP", "Failed to parse ssid, password and mode. Input data: %s", buf);
-        const char resp[] = "Failed to parse SSID, password, and mode. Please try again.";
-        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-        return ESP_FAIL;
-    }
 
-    ESP_LOGI("SETUP", "Received SSID: %s, Password: %s, Mode: %d", ssid, password, mode);
+//     ESP_LOGI("SETUP", "Received SSID: %s, Password: %s, Mode: %d", ssid, password, mode);
 
-    // Lưu chế độ và thông tin Wi-Fi vào NVS
-    nvs_handle_t nvs_handle;
-    esp_err_t err = nvs_open("storage", NVS_READWRITE, &nvs_handle);
-    if (err != ESP_OK) {
-        ESP_LOGE("SETUP", "Failed to open NVS handle! Error: %s", esp_err_to_name(err));
-        const char resp[] = "Failed to open NVS. Please try again.";
-        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-        return ESP_FAIL;
-    }
+//     // Lưu chế độ và thông tin Wi-Fi vào NVS
+//     nvs_handle_t nvs_handle;
+//     esp_err_t err = nvs_open("storage", NVS_READWRITE, &nvs_handle);
+//     if (err != ESP_OK) {
+//         ESP_LOGE("SETUP", "Failed to open NVS handle! Error: %s", esp_err_to_name(err));
+//         const char resp[] = "Failed to open NVS. Please try again.";
+//         httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+//         return ESP_FAIL;
+//     }
 
-    // Lưu chế độ vào NVS
-    err = nvs_set_i32(nvs_handle, "wifi_mode", mode);
-    if (err != ESP_OK) {
-        ESP_LOGE("SETUP", "Failed to set WiFi mode in NVS! Error: %s", esp_err_to_name(err));
-    }
+//     // Lưu chế độ vào NVS
+//     err = nvs_set_i32(nvs_handle, "wifi_mode", mode);
+//     if (err != ESP_OK) {
+//         ESP_LOGE("SETUP", "Failed to set WiFi mode in NVS! Error: %s", esp_err_to_name(err));
+//     }
 
-    // Nếu có SSID và Password, lưu chúng vào NVS
-    if (strlen(ssid) > 0 && strlen(password) > 0) {
-        err = nvs_set_str(nvs_handle, "ssid", ssid);
-        if (err != ESP_OK) {
-            ESP_LOGE("SETUP", "Failed to set SSID in NVS! Error: %s", esp_err_to_name(err));
-            nvs_close(nvs_handle);
-            const char resp[] = "Failed to save SSID. Please try again.";
-            httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-            return ESP_FAIL;
-        }
+//     // Nếu chế độ là AP + Bluetooth
+//     if (mode == 2) {
+//         ESP_LOGI(TAG, "AP + Bluetooth mode selected. Starting Bluetooth...");
 
-        err = nvs_set_str(nvs_handle, "password", password);
-        if (err != ESP_OK) {
-            ESP_LOGE("SETUP", "Failed to set Password in NVS! Error: %s", esp_err_to_name(err));
-            nvs_close(nvs_handle);
-            const char resp[] = "Failed to save Password. Please try again.";
-            httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-            return ESP_FAIL;
-        }
-    }
+//         // Khởi động Bluetooth và gửi yêu cầu người dùng gửi SSID và Password
+//         app_ble_start();
+//         const char ble_resp[] = "Bluetooth started. Please send SSID and Password via BLE.";
+//         app_ble_send_data((uint8_t*) ble_resp, strlen(ble_resp));
+        
+//         // Cài đặt callback để nhận dữ liệu từ BLE
+//         app_ble_set_data_recv_callback(ble_data_received_callback);
+        
+//         // Gửi phản hồi đến client
+//         httpd_resp_send(req, "Please send SSID and Password via Bluetooth.", HTTPD_RESP_USE_STRLEN);
+        
+//         // Đóng NVS
+//         nvs_close(nvs_handle);
+        
+//         return ESP_OK;
+//     }
 
-    // Commit thay đổi để lưu vào NVS
-    err = nvs_commit(nvs_handle);
-    if (err != ESP_OK) {
-        ESP_LOGE("SETUP", "Failed to commit changes in NVS! Error: %s", esp_err_to_name(err));
-        nvs_close(nvs_handle);
-        const char resp[] = "Failed to save settings. Please try again.";
-        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-        return ESP_FAIL;
-    }
 
-    // Đóng NVS
-    nvs_close(nvs_handle);
+//     // Nếu có SSID và Password, lưu chúng vào NVS
+//     if (strlen(ssid) > 0 && strlen(password) > 0) {
+//         err = nvs_set_str(nvs_handle, "ssid", ssid);
+//         if (err != ESP_OK) {
+//             ESP_LOGE("SETUP", "Failed to set SSID in NVS! Error: %s", esp_err_to_name(err));
+//             nvs_close(nvs_handle);
+//             const char resp[] = "Failed to save SSID. Please try again.";
+//             httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+//             return ESP_FAIL;
+//         }
 
-    // Gửi phản hồi thành công đến client
-    const char resp[] = "WiFi settings have been updated. Change to STA mode...";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+//         err = nvs_set_str(nvs_handle, "password", password);
+//         if (err != ESP_OK) {
+//             ESP_LOGE("SETUP", "Failed to set Password in NVS! Error: %s", esp_err_to_name(err));
+//             nvs_close(nvs_handle);
+//             const char resp[] = "Failed to save Password. Please try again.";
+//             httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+//             return ESP_FAIL;
+//         }
+//     }
 
-    // Đợi một chút rồi khởi động lại thiết bị để áp dụng cài đặt mới
-    vTaskDelay(1000 / portTICK_PERIOD_MS); // Chờ 1 giây để hoàn thành phản hồi HTTP
-    esp_restart(); // Khởi động lại thiết bị để áp dụng chế độ mới
+//     // Commit thay đổi để lưu vào NVS
+//     err = nvs_commit(nvs_handle);
+//     if (err != ESP_OK) {
+//         ESP_LOGE("SETUP", "Failed to commit changes in NVS! Error: %s", esp_err_to_name(err));
+//         nvs_close(nvs_handle);
+//         const char resp[] = "Failed to save settings. Please try again.";
+//         httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+//         return ESP_FAIL;
+//     }
 
-    return ESP_OK;
-}
+//     // Đóng NVS
+//     nvs_close(nvs_handle);
+
+//     // Gửi phản hồi thành công đến client
+//     const char resp[] = "WiFi settings have been updated. Change to STA mode...";
+//     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+
+//     // Đợi một chút rồi khởi động lại thiết bị để áp dụng cài đặt mới
+//     vTaskDelay(1000 / portTICK_PERIOD_MS); // Chờ 1 giây để hoàn thành phản hồi HTTP
+//     esp_restart(); // Khởi động lại thiết bị để áp dụng chế độ mới
+
+//     return ESP_OK;
+// }
 
 
 // Khởi tạo web server
@@ -245,4 +273,82 @@ void start_webserver(void) {
         httpd_register_uri_handler(server, &root);
         httpd_register_uri_handler(server, &setup);
     }
+}
+
+esp_err_t setup_post_handler(httpd_req_t *req) {
+    char buf[200];
+    int ret, remaining = req->content_len;
+
+    // Đọc dữ liệu từ yêu cầu POST
+    while (remaining > 0) {
+        if ((ret = httpd_req_recv(req, buf, MIN(remaining, sizeof(buf)))) <= 0) {
+            if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
+                continue;
+            }
+            return ESP_FAIL;
+        }
+        remaining -= ret;
+    }
+
+    buf[req->content_len] = '\0'; // Kết thúc chuỗi an toàn
+
+    int mode = 0; // Biến để lưu chế độ hoạt động
+
+    // Phân tích dữ liệu POST nhận được
+    if (sscanf(buf, "mode=%d", &mode) != 1) {
+        ESP_LOGE(TAG, "Failed to parse mode. Input data: %s", buf);
+        const char resp[] = "Failed to parse mode. Please try again.";
+        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+        return ESP_FAIL;
+    }
+
+    ESP_LOGI(TAG, "Parsed Mode: %d", mode);
+
+    // Mở NVS (Non-Volatile Storage) để lưu cài đặt Wi-Fi
+    nvs_handle_t nvs_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &nvs_handle);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to open NVS handle! Error: %s", esp_err_to_name(err));
+        const char resp[] = "Failed to open NVS. Please try again.";
+        httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+        return ESP_FAIL;
+    }
+
+    // Lưu chế độ Wi-Fi vào NVS
+    err = nvs_set_i32(nvs_handle, "wifi_mode", mode);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set WiFi mode in NVS! Error: %s", esp_err_to_name(err));
+    }
+
+    // Kiểm tra nếu chế độ là AP + Bluetooth
+    if (mode == 2) {
+        ESP_LOGI(TAG, "AP + Bluetooth mode selected. Starting Bluetooth...");
+
+        // Khởi động Bluetooth và gửi yêu cầu người dùng gửi SSID và Password qua BLE
+        app_ble_start();
+        
+        // Reset trạng thái nhận dữ liệu BLE
+        is_ssid_received = false;
+        is_password_received = false;
+
+        // Đăng ký callback nhận dữ liệu từ BLE
+        app_ble_set_data_recv_callback(ble_data_received_callback);
+
+        // Gửi phản hồi đến client
+        httpd_resp_send(req, "Please send SSID and Password via Bluetooth.", HTTPD_RESP_USE_STRLEN);
+        
+        // Đóng NVS
+        nvs_close(nvs_handle);
+        
+        return ESP_OK;
+    }
+
+    // Đóng NVS sau khi lưu chế độ
+    nvs_close(nvs_handle);
+
+    // Gửi phản hồi thành công đến client
+    const char resp[] = "Mode updated. Ready to receive SSID and Password.";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+
+    return ESP_OK;
 }

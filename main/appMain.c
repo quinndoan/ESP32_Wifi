@@ -81,11 +81,58 @@ void app_main(void) {
         wifi_init_softap(); // Khởi động chế độ AP
         start_webserver();  // Khởi động web server để chọn chế độ
     } else if (wifi_mode == 2) {
-        // Chế độ AP + Bluetooth Mode
         ESP_LOGI(TAG, "Starting in AP + Bluetooth Mode");
         wifi_init_softap();  // Khởi động chế độ AP
         start_webserver();   // Khởi động web server
         app_ble_start();    // Khởi động Bluetooth
+
+        // Đăng ký callback nhận dữ liệu từ BLE
+        app_ble_set_data_recv_callback(ble_data_received_callback);
+
+        // Thông báo người dùng gửi SSID và Password qua BLE
+        const char ble_resp[] = "Bluetooth started. Please send SSID and Password via BLE.";
+        app_ble_send_data((uint8_t*) ble_resp, strlen(ble_resp));
+         // Kiểm tra nếu đã nhận đủ SSID và Password
+    if (is_ssid_received && is_password_received) {
+        ESP_LOGI(TAG, "Received SSID and Password. Switching to STA Mode...");
+
+        // Lưu Wi-Fi mode thành 0 (STA Mode)
+        nvs_handle_t nvs_handle;
+        esp_err_t err = nvs_open("storage", NVS_READWRITE, &nvs_handle);
+        if (err == ESP_OK) {
+            // Cập nhật chế độ Wi-Fi thành STA Mode (0)
+            err = nvs_set_i32(nvs_handle, "wifi_mode", 0);
+            if (err == ESP_OK) {
+                ESP_LOGI(TAG, "Wi-Fi mode updated to STA (0).");
+            } else {
+                ESP_LOGE(TAG, "Failed to update Wi-Fi mode. Error: %s", esp_err_to_name(err));
+            }
+
+            // Commit thay đổi vào NVS
+            err = nvs_commit(nvs_handle);
+            if (err == ESP_OK) {
+                ESP_LOGI(TAG, "NVS commit successful. Restarting in STA Mode.");
+            } else {
+                ESP_LOGE(TAG, "Failed to commit NVS changes. Error: %s", esp_err_to_name(err));
+            }
+
+            // Đóng NVS
+            nvs_close(nvs_handle);
+
+            // Gửi phản hồi BLE
+            char success_msg[] = "Switching to STA Mode...";
+            app_ble_send_data((uint8_t *)success_msg, strlen(success_msg));
+
+            // Dừng BLE trước khi khởi động lại
+            app_ble_stop();
+
+            // Đợi một chút rồi khởi động lại thiết bị để chuyển sang STA
+            vTaskDelay(2000 / portTICK_PERIOD_MS); // Delay 2 giây
+            esp_restart();
+        } else {
+            ESP_LOGE(TAG, "Failed to open NVS. Error: %s", esp_err_to_name(err));
+        }
+    }
     } else {
         // Chế độ không hợp lệ, mặc định chuyển về AP Mode
         ESP_LOGW(TAG, "Unknown mode, defaulting to AP Mode");
