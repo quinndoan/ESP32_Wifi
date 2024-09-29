@@ -24,7 +24,7 @@ void app_main(void) {
     nvs_handle_t nvs_handle;
     ESP_ERROR_CHECK(nvs_open("storage", NVS_READWRITE, &nvs_handle));
 
-int32_t wifi_mode = 1;
+    int32_t wifi_mode = 1;
     esp_err_t err = nvs_get_i32(nvs_handle, "wifi_mode", &wifi_mode);
     if (err == ESP_ERR_NVS_NOT_FOUND) {
         // Nếu không tìm thấy wifi_mode trong NVS, gán giá trị mặc định là 1 (AP Mode)

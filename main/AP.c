@@ -23,7 +23,7 @@ void wifi_init_softap(void) {
         .ssid_len = strlen(EXAMPLE_ESP_WIFI_SSID),
         .channel = EXAMPLE_ESP_WIFI_CHANNEL,
         .password = EXAMPLE_ESP_WIFI_PASS,
-        .max_connection = EXAMPLE_MAX_STA_CONN,
+        .max_connection = 4,
         .authmode = WIFI_AUTH_WPA2_PSK, // Security dùng WPA2
         .pmf_cfg = {
             .required = false,
