@@ -7,7 +7,7 @@
 #include "esp_gatt_common_api.h"
 
 #include "sdkconfig.h"
-
+#include"Sta.h"
 
 #define GATTS_TAG "GATTS_DEMO"
 
@@ -651,61 +651,129 @@ void app_ble_set_data_recv_callback(void *cb)
     }
 }
 
+// void ble_data_received_callback(uint8_t *data, uint16_t length) {
+//     // Log dữ liệu nhận được dưới dạng hex để kiểm tra.
+//     esp_log_buffer_hex(TAG, data, length);
+
+//     // Chuyển dữ liệu nhận được thành chuỗi (string) để dễ dàng xử lý.
+//     char received_data[MAX_BLE_DATA_LEN] = {0};
+//     snprintf(received_data, sizeof(received_data), "%.*s", length, (char *)data);
+//     ESP_LOGI(TAG, "Received data from BLE: %s", received_data);
+
+//     // Kiểm tra nếu dữ liệu nhận được là SSID
+//     if (!is_ssid_received) {
+//         strncpy(ssid_buffer, received_data, sizeof(ssid_buffer) - 1);
+//         is_ssid_received = true; // Đã nhận SSID thành công
+//         ESP_LOGI(TAG, "SSID received: %s", ssid_buffer);
+
+//         // Gửi phản hồi BLE xác nhận đã nhận SSID và yêu cầu gửi Password
+//         char msg[] = "SSID received. Please send Password.";
+//         app_ble_send_data((uint8_t *)msg, strlen(msg));
+//     }
+//     // Nếu đã nhận SSID và bây giờ nhận Password
+//     else if (is_ssid_received && !is_password_received) {
+//         strncpy(password_buffer, received_data, sizeof(password_buffer) - 1);
+//         is_password_received = true; // Đã nhận Password thành công
+//         ESP_LOGI(TAG, "Password received: %s", password_buffer);
+
+//         // Sau khi nhận đầy đủ SSID và Password, lưu vào NVS và chuyển sang chế độ STA
+//         nvs_handle_t nvs_handle;
+//         esp_err_t err = nvs_open("storage", NVS_READWRITE, &nvs_handle);
+//         if (err == ESP_OK) {
+//             // Lưu SSID
+//             err = nvs_set_str(nvs_handle, "ssid", ssid_buffer);
+//             if (err == ESP_OK) {
+//                 ESP_LOGI(TAG, "SSID saved successfully.");
+//             } else {
+//                 ESP_LOGE(TAG, "Failed to save SSID. Error: %s", esp_err_to_name(err));
+//             }
+
+//             // Lưu Password
+//             err = nvs_set_str(nvs_handle, "password", password_buffer);
+//             if (err == ESP_OK) {
+//                 ESP_LOGI(TAG, "Password saved successfully.");
+//             } else {
+//                 ESP_LOGE(TAG, "Failed to save Password. Error: %s", esp_err_to_name(err));
+//             }
+
+//             // Cập nhật chế độ Wi-Fi thành STA Mode (0)
+//             err = nvs_set_i32(nvs_handle, "wifi_mode", 0);
+//             if (err == ESP_OK) {
+//                 ESP_LOGI(TAG, "Wi-Fi mode saved successfully.");
+//             } else {
+//                 ESP_LOGE(TAG, "Failed to save Wi-Fi mode. Error: %s", esp_err_to_name(err));
+//             }
+
+//             // Commit các thay đổi vào NVS
+//             if ((err = nvs_commit(nvs_handle)) == ESP_OK) {
+//                 ESP_LOGI(TAG, "NVS commit successful.");
+//             } else {
+//                 ESP_LOGE(TAG, "Failed to commit NVS changes. Error: %s", esp_err_to_name(err));
+//             }
+
+//             // Đóng NVS sau khi hoàn thành
+//             nvs_close(nvs_handle);
+//         } else {
+//             ESP_LOGE(TAG, "Failed to open NVS handle. Error: %s", esp_err_to_name(err));
+//         }
+
+//         // Gửi phản hồi xác nhận đã lưu thành công qua BLE
+//         char success_msg[] = "SSID and Password saved. Switching to STA mode...";
+//         app_ble_send_data((uint8_t *)success_msg, strlen(success_msg));
+
+//         // Dừng BLE trước khi khởi động lại
+//         app_ble_stop();
+
+//         // Đợi một chút rồi khởi động lại thiết bị để chuyển sang chế độ STA
+//         vTaskDelay(1000 / portTICK_PERIOD_MS);
+//         esp_restart();
+       
+//     }
+// }
 void ble_data_received_callback(uint8_t *data, uint16_t length) {
-    // Log dữ liệu nhận được dưới dạng hex để kiểm tra.
-    esp_log_buffer_hex(TAG, data, length);
-
-    // Chuyển dữ liệu nhận được thành chuỗi (string) để dễ dàng xử lý.
-    char received_data[MAX_BLE_DATA_LEN] = {0};
-    snprintf(received_data, sizeof(received_data), "%.*s", length, (char *)data);
-    ESP_LOGI(TAG, "Received data from BLE: %s", received_data);
-
-    // Kiểm tra nếu dữ liệu nhận được là SSID
+    // Nhận SSID trước
     if (!is_ssid_received) {
-        strncpy(ssid_buffer, received_data, sizeof(ssid_buffer) - 1);
-        is_ssid_received = true; // Đã nhận SSID thành công
+        strncpy(ssid_buffer, (char *)data, length);
+        ssid_buffer[length] = '\0';  // Đảm bảo kết thúc chuỗi an toàn
+        is_ssid_received = true;
         ESP_LOGI(TAG, "SSID received: %s", ssid_buffer);
-
-        // Gửi phản hồi BLE xác nhận đã nhận SSID và yêu cầu gửi Password
-        char msg[] = "SSID received. Please send Password.";
-        app_ble_send_data((uint8_t *)msg, strlen(msg));
+        app_ble_send_data((uint8_t *)"SSID received, please send Password", 36);
     }
-    // Nếu đã nhận SSID và bây giờ nhận Password
-    else if (is_ssid_received && !is_password_received) {
-        strncpy(password_buffer, received_data, sizeof(password_buffer) - 1);
-        is_password_received = true; // Đã nhận Password thành công
+    // Nhận Password sau khi đã nhận SSID
+    else if (!is_password_received) {
+        strncpy(password_buffer, (char *)data, length);
+        password_buffer[length] = '\0';  // Đảm bảo kết thúc chuỗi an toàn
+        is_password_received = true;
         ESP_LOGI(TAG, "Password received: %s", password_buffer);
+        app_ble_send_data((uint8_t *)"Password received, saving credentials...", 41);
 
-        // Sau khi nhận đầy đủ SSID và Password, lưu vào NVS và chuyển sang chế độ STA
+        // Sau khi nhận đầy đủ SSID và Password, lưu vào NVS
         nvs_handle_t nvs_handle;
         esp_err_t err = nvs_open("storage", NVS_READWRITE, &nvs_handle);
         if (err == ESP_OK) {
             // Lưu SSID
             err = nvs_set_str(nvs_handle, "ssid", ssid_buffer);
-            if (err == ESP_OK) {
-                ESP_LOGI(TAG, "SSID saved successfully.");
-            } else {
+            if (err != ESP_OK) {
                 ESP_LOGE(TAG, "Failed to save SSID. Error: %s", esp_err_to_name(err));
             }
 
             // Lưu Password
             err = nvs_set_str(nvs_handle, "password", password_buffer);
-            if (err == ESP_OK) {
-                ESP_LOGI(TAG, "Password saved successfully.");
-            } else {
+            if (err != ESP_OK) {
                 ESP_LOGE(TAG, "Failed to save Password. Error: %s", esp_err_to_name(err));
             }
 
-            // Cập nhật chế độ Wi-Fi thành STA Mode (0)
+            // Cập nhật chế độ Wi-Fi thành 0 (STA Mode)
             err = nvs_set_i32(nvs_handle, "wifi_mode", 0);
             if (err == ESP_OK) {
-                ESP_LOGI(TAG, "Wi-Fi mode saved successfully.");
+                ESP_LOGI(TAG, "Wi-Fi mode updated to STA (0).");
             } else {
-                ESP_LOGE(TAG, "Failed to save Wi-Fi mode. Error: %s", esp_err_to_name(err));
+                ESP_LOGE(TAG, "Failed to update Wi-Fi mode. Error: %s", esp_err_to_name(err));
             }
 
             // Commit các thay đổi vào NVS
-            if ((err = nvs_commit(nvs_handle)) == ESP_OK) {
+            err = nvs_commit(nvs_handle);
+            if (err == ESP_OK) {
                 ESP_LOGI(TAG, "NVS commit successful.");
             } else {
                 ESP_LOGE(TAG, "Failed to commit NVS changes. Error: %s", esp_err_to_name(err));
@@ -713,19 +781,16 @@ void ble_data_received_callback(uint8_t *data, uint16_t length) {
 
             // Đóng NVS sau khi hoàn thành
             nvs_close(nvs_handle);
+
+            // Gửi phản hồi BLE
+            char success_msg[] = "Switching to STA Mode and connecting to WiFi...";
+            app_ble_send_data((uint8_t *)success_msg, strlen(success_msg));
+
+            // Dừng BLE trước khi chuyển sang STA Mode
+            app_ble_stop();
+
         } else {
-            ESP_LOGE(TAG, "Failed to open NVS handle. Error: %s", esp_err_to_name(err));
+            ESP_LOGE(TAG, "Failed to open NVS. Error: %s", esp_err_to_name(err));
         }
-
-        // Gửi phản hồi xác nhận đã lưu thành công qua BLE
-        char success_msg[] = "SSID and Password saved. Switching to STA mode...";
-        app_ble_send_data((uint8_t *)success_msg, strlen(success_msg));
-
-        // Dừng BLE trước khi khởi động lại
-        app_ble_stop();
-
-        // Đợi một chút rồi khởi động lại thiết bị để chuyển sang chế độ STA
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-        esp_restart();
     }
 }
