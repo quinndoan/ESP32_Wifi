@@ -60,7 +60,7 @@ void wifi_event_handler(void* arg, esp_event_base_t event_base,
         ESP_LOGI(TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0; // Reset lại số lần thử
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT); // Đánh dấu kết nối thành công
-         for (int i = 0; i < 1000; i++) {
+         for (int i = 0; i < 10000; i++) {
         vTaskDelay(pdMS_TO_TICKS(10)); // Đợi khoảng 10 ms x 1000 lần ~ 10 giây
     }
 
