@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/main
+# Install script for directory: C:/Users/Nitro Tiger/ESP32_Wifi_BLE/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

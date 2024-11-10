@@ -1,6 +1,6 @@
 /* Automatically generated file; DO NOT EDIT */
 /* Espressif IoT Development Framework Linker Script */
-/* Generated from: C:\Users\Nitro Tiger\ESP_IDF_WIFI_AP\build\esp-idf\esp_system\ld\sections.ld.in */
+/* Generated from: C:\Users\Nitro Tiger\ESP32_Wifi_BLE\build\esp-idf\esp_system\ld\sections.ld.in */
 
 /*
 

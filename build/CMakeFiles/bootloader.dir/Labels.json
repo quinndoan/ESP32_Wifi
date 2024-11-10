@@ -2,34 +2,34 @@
 	"sources" : 
 	[
 		{
-			"file" : "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/CMakeFiles/bootloader"
+			"file" : "C:/Users/Nitro Tiger/ESP32_Wifi_BLE/build/CMakeFiles/bootloader"
 		},
 		{
-			"file" : "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/CMakeFiles/bootloader.rule"
+			"file" : "C:/Users/Nitro Tiger/ESP32_Wifi_BLE/build/CMakeFiles/bootloader.rule"
 		},
 		{
-			"file" : "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/CMakeFiles/bootloader-complete.rule"
+			"file" : "C:/Users/Nitro Tiger/ESP32_Wifi_BLE/build/CMakeFiles/bootloader-complete.rule"
 		},
 		{
-			"file" : "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+			"file" : "C:/Users/Nitro Tiger/ESP32_Wifi_BLE/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
 		},
 		{
-			"file" : "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+			"file" : "C:/Users/Nitro Tiger/ESP32_Wifi_BLE/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
 		},
 		{
-			"file" : "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+			"file" : "C:/Users/Nitro Tiger/ESP32_Wifi_BLE/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
 		},
 		{
-			"file" : "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+			"file" : "C:/Users/Nitro Tiger/ESP32_Wifi_BLE/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
 		},
 		{
-			"file" : "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+			"file" : "C:/Users/Nitro Tiger/ESP32_Wifi_BLE/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
 		},
 		{
-			"file" : "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+			"file" : "C:/Users/Nitro Tiger/ESP32_Wifi_BLE/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
 		},
 		{
-			"file" : "C:/Users/Nitro Tiger/ESP_IDF_WIFI_AP/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+			"file" : "C:/Users/Nitro Tiger/ESP32_Wifi_BLE/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
 		}
 	],
 	"target" : 
