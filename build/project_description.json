@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "ESP_IDF_WIFI_AP",
-    "project_version":    "25bf0bd-dirty",
+    "project_version":    "d380c2c-dirty",
     "project_path":       "C:/Users/Nitro Tiger/ESP32_Wifi_BLE",
     "idf_path":           "C:/esp/v5.3/esp-idf",
     "build_dir":          "C:/Users/Nitro Tiger/ESP32_Wifi_BLE/build",

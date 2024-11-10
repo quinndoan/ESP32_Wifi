@@ -5,7 +5,7 @@
 #include "bluetooth.h"
 
 extern const char *TAG;
-int32_t wifi_mode = 1; // 0: STA Mode, 1: AP Mode, 2: AP + Bluetooth Mode
+int32_t wifi_mode = 2; // 0: STA Mode, 1: AP Mode, 2: AP + Bluetooth Mode
 
 // Các biến để theo dõi trạng thái Wi-Fi AP và STA đã khởi tạo chưa
 bool ap_initialized = false;
@@ -28,7 +28,7 @@ void app_main(void) {
     nvs_handle_t nvs_handle;
     ESP_ERROR_CHECK(nvs_open("storage", NVS_READWRITE, &nvs_handle));
 
-    int32_t wifi_mode = 1; // Bắt đầu luôn bằng AP Mode
+    int32_t wifi_mode = 2; // Bắt đầu luôn bằng AP Mode
     esp_err_t err = nvs_get_i32(nvs_handle, "wifi_mode", &wifi_mode);
     if (err == ESP_OK) {
         ESP_LOGI(TAG, "Read WiFi mode from NVS: %ld", wifi_mode); // In ra giá trị wifi_mode
